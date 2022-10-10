@@ -85,7 +85,7 @@ int local_calculate_temperature(chemistry_data *my_chemistry,
 
   double temperature_units = get_temperature_units(my_units);
 
-  double number_density, tiny_number = 1.-20;
+  double number_density, tiny_number = 1.e-20;
   double inv_metal_mol = 1.0 / MU_METAL;
   
   if (my_chemistry->primordial_chemistry == 0) {

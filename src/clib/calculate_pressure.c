@@ -38,6 +38,7 @@ int local_calculate_pressure(chemistry_data *my_chemistry,
   if (!my_chemistry->use_grackle)
     return SUCCESS;
 
+  double mu_metal = 16.0;
   double tiny_number = 1.e-20;
   const grackle_index_helper ind_helper = _build_index_helper(my_fields);
   int outer_ind, index;
@@ -65,6 +66,10 @@ int local_calculate_pressure(chemistry_data *my_chemistry,
   /* Correct for Gamma from H2. */
 
   if (my_chemistry->primordial_chemistry > 1) {
+
+      int metal_field_present = TRUE;
+      if (my_fields->metal_density == NULL)
+        metal_field_present = FALSE;
  
     /* Calculate temperature units. */
 
@@ -90,6 +95,10 @@ int local_calculate_pressure(chemistry_data *my_chemistry,
                   my_fields->HeIII_density[index]) +
           my_fields->HI_density[index] + my_fields->HII_density[index] +
           my_fields->HM_density[index] + my_fields->e_density[index];
+        
+        if(metal_field_present==TRUE){
+          number_density = number_density + my_fields->metal_density[index]/mu_metal;
+        }
 
         nH2 = 0.5 * (my_fields->H2I_density[index] +
 		     my_fields->H2II_density[index]);
@@ -100,6 +109,10 @@ int local_calculate_pressure(chemistry_data *my_chemistry,
           number_density = tiny_number;
         temp = max(temperature_units * pressure[index] / (number_density + nH2),
 		   1);
+
+        if(metal_field_present==TRUE){
+          number_density = number_density - my_fields->metal_density[index]/mu_metal;
+        }
 
         /* Only do full computation if there is a reasonable amount of H2.
 	   The second term in GammaH2Inverse accounts for the vibrational

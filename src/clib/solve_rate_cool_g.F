@@ -46,7 +46,7 @@
      &                metDataSize, metCooling, metHeating, clnew,
      &                iVheat, iMheat, Vheat, Mheat,
      &                iisrffield, isrf_habing, 
-     &                iH2shieldcustom, f_shield_custom)
+     &                iH2shieldcustom, f_shield_custom, temfloor)
 
 !
 !  SOLVE MULTI-SPECIES RATE EQUATIONS AND RADIATIVE COOLING
@@ -143,6 +143,7 @@
 !    iMheat      - flag for using specific heating rate
 !    Vheat       - array of volumetric heating rates
 !    Mheat       - array of specific heating rates
+!    temfloor    - Temperature lower floor for cooling
 !
 !  OUTPUTS:
 !    update chemical rate densities (HI, HII, etc)
@@ -281,9 +282,9 @@
       integer*8 indixe(in)
       real*8 t1(in), t2(in), logtem(in), tdef(in),
      &       dtit(in), ttot(in), p2d(in), tgas(in), tgasold(in),
-     &       tdust(in), metallicity(in), dust2gas(in),
+     &       tdust(in), metallicity(in), dust2gas(in), gmmeff(in),
      &       rhoH(in), mmw(in), mynh(in), myde(in), gammaha_eff(in),
-     &       gasgr_tdust(in), regr(in), olddtit
+     &       gasgr_tdust(in), regr(in), olddtit, ufloor
 
 !  Rate equation row temporaries
 
@@ -311,6 +312,10 @@
      &       brem(in), edot(in)
       real*8 hyd01k(in), h2k01(in), vibh(in), roth(in), rotl(in),
      &       gpldl(in), gphdl(in), hdlte(in), hdlow(in), cieco(in)
+
+!  Temperature lower floor for cooling
+
+      real*8 temfloor
 
 !  Iteration mask
 
@@ -498,7 +503,7 @@
      &                metPar1, metPar2, metPar3, metPar4, metPar5,
      &                metDataSize, metCooling, metHeating, clnew,
      &                iVheat, iMheat, Vheat, Mheat,
-     &                iisrffield, isrf_habing, itmask)
+     &                iisrffield, isrf_habing, itmask, gmmeff)
 
             if (ispecies .gt. 0) then
 
@@ -753,8 +758,25 @@
 !           Update total and gas energy
 
             if (icool .eq. 1) then
+!           Mialy addings : floor temperature through energy
+!           -->  e(i,j,k)  = e(i,j,k) +
+!           &    real(edot(i)/d(i,j,k)*dtit(i), RKIND)
+
             do i = is+1, ie+1
-               if (itmask(i)) then
+               if ( itmask(i) ) then
+                  ufloor = temfloor/(utem * (gmmeff(i) - 1._DKIND))
+                  ufloor = ufloor/mmw(i)
+                  !write(*,*) 'tgas(i)=',tgas(i)
+                  !write(*,*) 'temfloor=',temfloor
+                  !write(*,*) 'gmmeff(i)=',gmmeff(i)
+                  !write(*,*) 'ufloor=',ufloor * uvel * uvel
+                  !write(*,*) 'energy n =',e(i,j,k) * uvel * uvel
+                  !write(*,*) 'edot n =',edot(i) * uvel * uvel
+                  !write(*,*) 'L1 n =', real(edot(i)/d(i,j,k)*dtit(i), RKIND) * uvel * uvel
+                  !write(*,*) 'e+L1=', (e(i,j,k)+real(edot(i)/d(i,j,k)*dtit(i), RKIND))* uvel * uvel
+                  if(e(i,j,k) + real(edot(i)/d(i,j,k)*dtit(i), RKIND) .le. ufloor) then
+                    edot(i) = (ufloor - e(i,j,k))/dtit(i)*d(i,j,k)
+                  end if
                e(i,j,k)  = e(i,j,k) +
      &                 real(edot(i)/d(i,j,k)*dtit(i), RKIND)
 #ifdef WRITE_COOLING_DEBUG

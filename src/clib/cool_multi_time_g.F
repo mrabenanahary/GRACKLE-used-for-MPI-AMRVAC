@@ -123,7 +123,7 @@
  
       integer*8 indixe(in)
       real*8 t1(in), t2(in), logtem(in), tdef(in), p2d(in),
-     &       tgas(in), tgasold(in), mmw(in),
+     &       tgas(in), tgasold(in), mmw(in), gmmeff(in),
      &       tdust(in), metallicity(in), dust2gas(in), rhoH(in),
      &       mynh(in), myde(in), gammaha_eff(in),
      &       gasgr_tdust(in), regr(in)
@@ -287,7 +287,7 @@
      &                metPar1, metPar2, metPar3, metPar4, metPar5,
      &                metDataSize, metCooling, metHeating, clnew,
      &                iVheat, iMheat, Vheat, Mheat,
-     &                iisrffield, isrf_habing, itmask)
+     &                iisrffield, isrf_habing, itmask, gmmeff)
 
 !        Compute the cooling time on the slice
 !          (the gamma used here is the same as used to calculate the pressure

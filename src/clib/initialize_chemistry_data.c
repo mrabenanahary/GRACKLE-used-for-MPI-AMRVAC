@@ -397,6 +397,7 @@ int _free_chemistry_data(chemistry_data *my_chemistry,
     GRACKLE_FREE(my_rates->GAel);
     GRACKLE_FREE(my_rates->H2LTE);
     GRACKLE_FREE(my_rates->gas_grain);
+    GRACKLE_FREE(my_rates->regr);    
 
     GRACKLE_FREE(my_rates->k1);
     GRACKLE_FREE(my_rates->k2);

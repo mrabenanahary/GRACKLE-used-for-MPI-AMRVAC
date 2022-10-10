@@ -43,7 +43,7 @@
      &                metDataSize, metCooling, metHeating, clnew,
      &                iVheat, iMheat, Vheat, Mheat,
      &                iisrffield, isrf_habing,
-     &                itmask)
+     &                itmask, gmmeff)
 
 !  SOLVE RADIATIVE COOLING/HEATING EQUATIONS
 !
@@ -144,7 +144,7 @@
       real*8 t1(in), t2(in), logtem(in), tdef(in), p2d(in),
      &       tgas(in), tgasold(in), mmw(in), tdust(in), rhoH(in),
      &       mynh(in), metallicity(in), dust2gas(in), edot(in),
-     &       myde(in), gammaha_eff(in)
+     &       myde(in), gammaha_eff(in), gmmeff(in)
 
 !  Cooling/heating slice locals
 
@@ -246,12 +246,19 @@
      &        priDataSize, priMMW,
      &        itmask)
 
+      do i = is+1, ie+1
+        if ( itmask(i) ) then
+           gmmeff(i) = gamma
+        endif
+      enddo     
+
       else
 
 !     Compute mean molecular weight (and temperature) directly
 
          do i = is+1, ie+1
             if ( itmask(i) ) then
+               gmmeff(i) = gamma                           
                mmw(i) =
      &              (HeI(i,j,k) + HeII(i,j,k) + HeIII(i,j,k))/4._DKIND +
      &              HI(i,j,k) + HII(i,j,k) + de(i,j,k)
@@ -296,7 +303,7 @@
                if ( itmask(i) ) then
                   nH2 = 0.5_DKIND*(H2I(i,j,k) + H2II(i,j,k))
                   nother = (HeI(i,j,k) + HeII(i,j,k) +
-     &                 HeIII(i,j,k))/4._DKIND +
+     &                 HeIII(i,j,k))/4._DKIND + HM(i,j,k) +
      &                 HI(i,j,k) + HII(i,j,k) + de(i,j,k)
                   if (nH2/nother .gt. 1.0e-3_DKIND) then
                      x = 6100._DKIND/tgas(i) ! not quite self-consistent
@@ -311,6 +318,7 @@
                   endif
                   gamma2 = 1._DKIND + (nH2 + nother)/
      &                 (nH2*gamma2 + nother/(gamma-1._DKIND))
+                  gmmeff(i) = gamma2     
                   tgas(i) = tgas(i) * (gamma2 - 1._DKIND)/
      &                 (gamma - 1._DKIND)
                end if
@@ -939,8 +947,9 @@ c  new (correct) way: (april 4, 2007)
      &                 (d(i,j,k) * mu_metal)
                endif
                myde(i) = d(i,j,k) * myde(i) / mmw(i)
-               myde(i) = max(myde(i), 0._DKIND)
-
+               !myde(i) = max(myde(i), 0._DKIND)!old
+               myde(i) = max(myde(i), tiny)!new
+               
             end if
          enddo
 
