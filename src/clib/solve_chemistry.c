@@ -497,6 +497,8 @@ int f_solve_chemistry(code_units *my_units,
 
   if(grackle_data->primordial_chemistry>0){
     for(int i=0;i<1;i++){
+      fprintf(stdout, "density : %e \n",my_fields->density[1]*my_units->density_units);
+      fprintf(stdout, "energy : %e \n",my_fields->internal_energy[1]*my_units->velocity_units*my_units->velocity_units);
       fprintf(stdout, "HI : %e \n",my_fields->HI_density[1]*my_units->density_units);
       fprintf(stdout, "HII : %e \n",my_fields->HII_density[1]*my_units->density_units);
       fprintf(stdout, "HeI : %e \n",my_fields->HeI_density[1]*my_units->density_units);

@@ -62,7 +62,7 @@ def setup_fluid_container(my_chemistry,
     if rval == 0:
         raise RuntimeError("Failed to initialize chemistry_data.")
 
-    tiny_number = 1e-15
+    tiny_number = 1e-13
     if temperature is None:
         n_points = 200
         temperature = np.logspace(4, 9, n_points)
@@ -76,7 +76,7 @@ def setup_fluid_container(my_chemistry,
         fc["HeI"][:] = (1.0 - hydrogen_mass_fraction) * fc["density"]
         fc["HeII"][:] = tiny_number * fc["density"]
         fc["HeIII"][:] = tiny_number * fc["density"]
-        fc["de"][:] = fc["HII"] + fc["HeII"] / 4.0 + fc["HeIII"] / 2.0
+        fc["de"][:] = tiny_number * fc["density"]#fc["de"][:] - fc["HM"] + fc["H2II"] / 2.0    
     if my_chemistry.primordial_chemistry > 1:
         """    
         fc["HII"][:] = tiny_number * fc["density"]
@@ -84,10 +84,10 @@ def setup_fluid_container(my_chemistry,
         fc["H2I"][:] = hydrogen_mass_fraction * fc["density"]
         fc["H2II"][:] = tiny_number * fc["density"]
         """
-        fc["H2I"][:] = tiny_number * fc["density"]
+        fc["HI"][:] = 0.5*hydrogen_mass_fraction * fc["density"] #tiny_number * fc["density"]
         fc["HII"][:] = tiny_number * fc["density"]
         fc["HM"][:] = tiny_number * fc["density"]
-        fc["HI"][:] = hydrogen_mass_fraction * fc["density"]
+        fc["H2I"][:] = 0.5*hydrogen_mass_fraction * fc["density"]
         fc["H2II"][:] = tiny_number * fc["density"]
         fc["HeI"][:] = (1.0 - hydrogen_mass_fraction) * fc["density"]
         fc["HeII"][:] = tiny_number * fc["density"]
@@ -95,7 +95,8 @@ def setup_fluid_container(my_chemistry,
         fc["de"][:] = tiny_number * fc["density"]#fc["de"][:] - fc["HM"] + fc["H2II"] / 2.0    
     if my_chemistry.primordial_chemistry > 2:
         fc["DI"][:] = 2.0 * d_to_h_ratio * \
-        (fc["HI"][:]+fc["HII"][:]+fc["HM"][:]+fc["H2I"][:]+fc["H2II"][:])
+        fc["density"]
+        #(fc["HI"][:]+fc["HII"][:]+fc["HM"][:]+fc["H2I"][:]+fc["H2II"][:])
         fc["DII"][:] = tiny_number * fc["density"]
         fc["HDI"][:] = tiny_number * fc["density"]
     fc["metal"][:] = metal_mass_fraction * fc["density"]
@@ -105,21 +106,33 @@ def setup_fluid_container(my_chemistry,
     if my_chemistry.primordial_chemistry > 0:
         fc["de"][:] =  fc["de"][:]*(mass_hydrogen_cgs/mass_electron_cgs)
 
-    #print("mu 1 = ",fc["mu"])
-    #print("gamma 1 = ",fc["gamma"])
-    #print("temperature 1 = ",fc["temperature"])
+    print("mu 1 = ",fc["mu"])
+    print("gamma 1 = ",fc["gamma"])
+    print("temperature 1 = ",fc["temperature"])
+    fc["temperature"] = temperature
+    fc.calculate_gamma()
+    fc.calculate_mean_molecular_weight()
+    fc["energy"] = temperature / \
+    fc.chemistry_data.temperature_units / \
+    fc["mu"] / (fc["gamma"] - 1.0)
+    
+    print("mu B = ",fc["mu"])
+    print("gamma B = ",fc["gamma"])
+    print("temperature B = ",temperature)
+    
+    fc.calculate_gamma()
+
+    print("mu C = ",fc["mu"])
+    print("gamma C = ",fc["gamma"])
+    print("temperature C = ",temperature)
+
+    fc["energy"] = temperature / \
+    fc.chemistry_data.temperature_units / \
+    fc["mu"] / (fc["gamma"] - 1.0)
+
+    #if my_chemistry.primordial_chemistry > 0:
     fc.calculate_mean_molecular_weight()
     fc.calculate_gamma()
-    #print("mu 2 = ",fc["mu"])
-    #print("gamma 2 = ",fc["gamma"])
-    #print("temperature 2 = ",fc["temperature"])
-    fc["temperature"] = temperature
-    fc["energy"] = temperature / \
-        fc.chemistry_data.temperature_units / \
-        fc["mu"] / (fc["gamma"] - 1.0)
-    if my_chemistry.primordial_chemistry > 0:
-        fc.calculate_mean_molecular_weight()
-        fc.calculate_gamma()
     #print("mu 2b = ",fc["mu"])
     #print("gamma 2b = ",fc["gamma"])        
     fc["x-velocity"][:] = 0.0
@@ -141,9 +154,9 @@ def setup_fluid_container(my_chemistry,
         if my_chemistry.primordial_chemistry > 0:
             fc["de"][:] =  fc["de"][:]*(mass_hydrogen_cgs/mass_electron_cgs)        
         fc.calculate_cooling_time()
-        if my_chemistry.primordial_chemistry > 0:
-            fc.calculate_gamma()
-        fc.calculate_pressure()
+        #if my_chemistry.primordial_chemistry > 0:
+        #    fc.calculate_gamma()
+        #fc.calculate_pressure()
         dt = 0.1 * np.abs(fc["cooling_time"]).min()
         #dt = 2.230e12/my_chemistry.time_units
         #sys.stderr.write("t: %.3f Myr, dt: %.3e Myr, " % \
@@ -151,7 +164,7 @@ def setup_fluid_container(my_chemistry,
         #                  (dt * my_chemistry.time_units / sec_per_Myr)))
         print("t: %.3e s, dt: %.3e s, " % \
                          ((my_time * my_chemistry.time_units),
-                          (dt * my_chemistry.time_units)))
+                          (dt * my_chemistry.time_units)))        
         for field in ["HI", "HII", "HM", "HeI", "HeII", "HeIII",
                       "H2I", "H2II", "DI", "DII", "HDI", "de"]:
             if field in fc:
@@ -169,8 +182,14 @@ def setup_fluid_container(my_chemistry,
         print("cooling_time : ", fc["cooling_time"][-1]*my_chemistry.time_units)
         print("dt : ", dt*my_chemistry.time_units)
         if my_chemistry.primordial_chemistry > 0:
-            for field in ["HI", "HII", "HM", "HeI", "HeII", "HeIII",
-                        "H2I", "H2II", "de", "metal", "dust"]:
+            for field in ["HI", "HII",  "HeI", "HeII", "HeIII",
+                         "de", "metal", "dust"]:
+                print(field," : ",fc[field][-1]* my_chemistry.density_units)
+        if my_chemistry.primordial_chemistry > 1:                           
+            for field in ["HM", "H2I", "H2II"]:
+                print(field," : ",fc[field][-1]* my_chemistry.density_units)             
+        if my_chemistry.primordial_chemistry > 2:
+            for field in ["DI","DII","HDI"]:                        
                 print(field," : ",fc[field][-1]* my_chemistry.density_units)
         
         if my_chemistry.primordial_chemistry > 0:
@@ -183,6 +202,9 @@ def setup_fluid_container(my_chemistry,
         print("cooling_rate : ", cooling_rate[-1])
         if my_chemistry.primordial_chemistry > 0:
             fc["de"][:] =  fc["de"][:]*(mass_hydrogen_cgs/mass_electron_cgs)          
+        print("energy 1 : ", fc["energy"][-1]*my_chemistry.energy_units)
+        print("cooling time 1 : ", fc["cooling_time"][-1]*my_chemistry.time_units)
+        print("mu 1 : ", fc["mu"][-1])
         fc.solve_chemistry(dt)
         fc.calculate_cooling_time()
         fc.calculate_gamma()
@@ -202,17 +224,27 @@ def setup_fluid_container(my_chemistry,
         print("cooling_time : ", fc["cooling_time"][-1]*my_chemistry.time_units)
         print("dt : ", dt*my_chemistry.time_units)
         if my_chemistry.primordial_chemistry > 0:
-            for field in ["HI", "HII", "HM", "HeI", "HeII", "HeIII",
-                        "H2I", "H2II", "de", "metal", "dust"]:
+            for field in ["HI", "HII",  "HeI", "HeII", "HeIII",
+                         "de", "metal", "dust"]:
                 print(field," : ",fc[field][-1]* my_chemistry.density_units)
+        if my_chemistry.primordial_chemistry > 1:                           
+            for field in ["HM", "H2I", "H2II"]:
+                print(field," : ",fc[field][-1]* my_chemistry.density_units)             
+        if my_chemistry.primordial_chemistry > 2:
+            for field in ["DI","DII","HDI"]:                        
+                print(field," : ",fc[field][-1]* my_chemistry.density_units)
+                        
         if my_chemistry.primordial_chemistry > 0:
             fc["de"][:] =  fc["de"][:]*(mass_electron_cgs/mass_hydrogen_cgs)                
         density_proper = fc["density"] / \
         (my_chemistry.a_units *
          my_chemistry.a_value)**(3*my_chemistry.comoving_coordinates)
-        cooling_rate = fc.chemistry_data.cooling_units * fc["energy"] / \
+        cooling_rate_print = fc.chemistry_data.cooling_units * fc["energy"] / \
         np.abs(fc["cooling_time"]) / density_proper
-        print("cooling_rate : ", cooling_rate[-1])
+        print("cooling_rate 1 : ", cooling_rate_print[-1])
+        print("energy 2 : ", fc["energy"][-1]*my_chemistry.energy_units)
+        print("cooling time 2 : ", fc["cooling_time"][-1]*my_chemistry.time_units)
+        print("mu 2 : ", fc["mu"][-1])
         #print("mu 3 = ",fc["mu"])
         #print("gamma 3 = ",fc["gamma"])
         #print("temperature 3 = ",fc["temperature"])
@@ -227,12 +259,16 @@ def setup_fluid_container(my_chemistry,
         fc["energy"] = temperature / \
             fc.chemistry_data.temperature_units / fc["mu"] / \
             (my_chemistry.Gamma - 1.0)
+        my_time += dt
+        print("t: %.3e s, dt: %.3e s, " % \
+                         ((my_time * my_chemistry.time_units),
+                          (dt * my_chemistry.time_units)))            
         converged = check_convergence(fc, fc_last, tol=tolerance)
         if converged:
             sys.stderr.write("\n")
             break
         sys.stderr.write("\r")
-        my_time += dt
+
         i += 1
 
     """if i >= max_iterations:
@@ -240,4 +276,6 @@ def setup_fluid_container(my_chemistry,
                          max_iterations)
         return None
     """
+
+    print("final time = %.8e s" % (my_time*my_chemistry.time_units))
     return fc

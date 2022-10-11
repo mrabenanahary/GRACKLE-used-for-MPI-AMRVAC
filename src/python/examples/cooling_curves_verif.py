@@ -58,7 +58,7 @@ mpl.rcdefaults()
 
 Latex=False
 font = {'family' : 'serif',
-        'size'   : 17,
+        'size'   : 9,
         'weight' : 'extra bold'}
 plt.rc('text', usetex=Latex)
 plt.rc('font', **font)
@@ -820,42 +820,51 @@ lambda_hd_over_f_i = np.array(ytab)#-np.log10(np.array(xtab))
 lambda_hd_over_f_i = [[lambda_hd_over_f_i[i][j] for i in range(0,len(lambda_hd_over_f_i))] for j in range(0,len(lambda_hd_over_f_i[0]))]
 xtab = [file2[i][0] for i in range(0,len(file2))]
 
-pyplot.figure(figsize=(12,12))
+pyplot.figure(figsize=(6,6))
 """pyplot.semilogy(XX, 10**np.array(YY),
               color="black",label=r'SPEX $\Lambda$ for solar metallicity above $T>10^4$ K (Schure et al. 2009)',)
 """
 a1=[4,3,2,1]
 a2=['red','green','blue','orange']
-a4=['cyan','brown','purple','cyan','brown','purple','k','k']
-a5=['Th. equil. atom. chem.',
-'Th. non-equil. atom. chem.',
-'Th. non-equil. H2 chem. (no deuter.)',
-'AMRVAC equil. atom. chem.',
-'AMRVAC non-equil. atom. chem.',
-'AMRVAC non-equil. H2 chem. (H2I-full)',
-'Smith et al. 2017',
-'AMVRAC with Smith et al. 2017 parameters']
+a4=['k','red','green','blue','orange','pink',
+    'k','red','green','blue','orange','pink']
+a5=['Grackle et al. 2017',
+'AMRVAC:Grackle17+',
+'Eq. chem. 1 (PyGrackle)',
+'AMRVAC:Eq. chem. 1',
+'Eq. chem. 2 (PyGrackle)',
+'AMRVAC:Eq. chem. 2',
+'Non-eq. atom. chem. 1 (PyGrackle)',
+'AMRVAC:Non-eq. atom. chem. 1 (PyGrackle)',
+'Non-eq. H2 chem. 1 (PyGrackle)',
+'AMRVAC:Non-eq. H2 chem. 1 (PyGrackle)',
+'Non-eq. H2 chem. 2 (PyGrackle)',
+'AMRVAC:Non-eq. H2 chem. 2 (PyGrackle)',]
 a6=[False,True,False]
 a7=[1,0,2]
 a3=[False,False,False,True]
 a8=["CloudyData_noUVB.h5","CloudyData_noUVB.h5","CloudyData_noUVB.h5"]
-a9=[1.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0]
-a10=['--','--','--','None','None','None','-','None']
-a13=['None','None','None','X','X','X','None','X']
-a14=[0,0,0,10,10,10,0,10]
+a9=[0.1,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0]
+a10=['-','None','--','None','--','None',':','None','dashdot','None','dashdot','None']
+a13=['None','x','None','*','None','*','None','P','None','o','None','o']
+a14=[0,10,0,10,0,10,0,10,0,10,0,10]
 """for i in range(0,4):
     pyplot.semilogy(xtab,10**np.array(lambda_hd_over_f_i[i]),
                   color=a2[i],label=r'$\Lambda$ for $T<10^4$ K \& $f_i = 10^{-%d}$ (Dalgarno \& McCray 1972)' % (a1[i]),)
 """
 
-filenames = ["Curves_Th_Equilibrum_Atom.csv",
-            "Curves_Th_Non-Equilibrum_Atom.csv",
-            "Curves_Th_Non-Equilibrum_H2(noDeut).csv",
-            "Curves_AMRVAC_Equilibrum_Atom.csv",
-            "Curves_AMRVAC_Non-Equilibrum_Atom.csv",
-            "Curves_AMRVAC_Non-Equilibrum_H2(noDeut).csv",
-            "Curves_Grackle2017_Th.csv",
-            "Curves_Grackle2017_AMRVAC.csv"]
+filenames = ["Curves - Grackle17+TH.csv",
+            "Curves - Grackle17+AMRVAC.csv",
+            "Curves - AtomiqueEquil1TH.csv",
+            "Curves - AtomiqueEquil1AMRVAC.csv",
+            "Curves - AtomiqueEquil2TH.csv",
+            "Curves - AtomiqueEquil2AMRVAC.csv",
+            "Curves - AtomiqueHorsEquil2TH.csv",
+            "Curves - AtomiqueHorsEquil2AMRVAC.csv",
+            "Curves - H2HorsEquil1TH.csv",
+            "Curves - H2HorsEquil1AMRVAC.csv",
+            "Curves - H2HorsEquil2TH.csv",
+            "Curves - H2HorsEquil2AMRVAC.csv"]
 
 
 for i,el in enumerate(filenames):    
@@ -864,7 +873,7 @@ for i,el in enumerate(filenames):
     Ydata = list(data[1][:])
     pyplot.semilogy(np.log10(Xdata), Ydata,
                   color=a4[i],lw=a9[i], marker=a13[i],markersize=a14[i],ls=a10[i],label=r'{:s}'.format(a5[i]))
-    pyplot.xlabel(r'T [K]')
+    pyplot.xlabel(r'$\log_{10}(T)$~[K]')
     pyplot.ylabel(r'$|\Lambda|$ [erg s$^{-1}$ cm$^{3}$]')
 
 

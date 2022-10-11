@@ -58,7 +58,7 @@ mpl.rcdefaults()
 
 Latex=False
 font = {'family' : 'serif',
-        'size'   : 17,
+        'size'   : 9,
         'weight' : 'extra bold'}
 plt.rc('text', usetex=Latex)
 plt.rc('font', **font)
@@ -820,13 +820,12 @@ lambda_hd_over_f_i = np.array(ytab)#-np.log10(np.array(xtab))
 lambda_hd_over_f_i = [[lambda_hd_over_f_i[i][j] for i in range(0,len(lambda_hd_over_f_i))] for j in range(0,len(lambda_hd_over_f_i[0]))]
 xtab = [file2[i][0] for i in range(0,len(file2))]
 
-pyplot.figure(figsize=(10,10))
-min_slice = XX>=np.max(xtab)
-XX = list(np.array(XX)[min_slice])
-YY = list(np.array(YY)[min_slice])
-
+pyplot.figure(figsize=(6,6))
+"""pyplot.semilogy(XX, 10**np.array(YY),
+              color="black",label=r'SPEX $\Lambda$ for solar metallicity above $T>10^4$ K (Schure et al. 2009)',)
+"""
 a1=[4,3,2,1]
-a2=['red','k','blue','orange']
+a2=['red','green','blue','orange']
 a4=['k','k','red','red','green','green',
     'blue','blue','orange','orange','pink','pink']
 a5=['Grackle et al. 2017',
@@ -846,20 +845,14 @@ a7=[1,0,2]
 a3=[False,False,False,True]
 
 a8=["CloudyData_noUVB.h5","CloudyData_noUVB.h5","CloudyData_noUVB.h5"]
-a9=[0.1,0.0,1.0,0.0,1.0,0.0,2.0,0.0,2.0,0.0,2.0,0.0]
+a9=[0.1,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0]
 a10=['-','None','--','None','--','None',':','None','dashdot','None','dashdot','None']
 a13=['None','x','None','*','None','*','None','P','None','o','None','o']
 a14=[0,10,0,10,0,10,0,10,0,10,0,10]
-i = 1
-
-#pyplot.semilogy(xtab,10**np.array(lambda_hd_over_f_i[i]),
-#                  color=a2[i])
-
-x_val = np.concatenate((xtab,XX), axis=0)
-y_val = np.concatenate((10**np.array(lambda_hd_over_f_i[i]),10**np.array(YY)), axis=0)
-pyplot.semilogy(x_val, y_val,
-              color="black",label=r'Schure+06 \& Dalgarno+72 ($f_i=10^{-3}$)',)
-
+"""for i in range(0,4):
+    pyplot.semilogy(xtab,10**np.array(lambda_hd_over_f_i[i]),
+                  color=a2[i],label=r'$\Lambda$ for $T<10^4$ K \& $f_i = 10^{-%d}$ (Dalgarno \& McCray 1972)' % (a1[i]),)
+"""
 
 filenames = ["Curves - Grackle17+TH.csv",
             "Curves - Grackle17+AMRVAC.csv",
@@ -875,7 +868,7 @@ filenames = ["Curves - Grackle17+TH.csv",
             "Curves - H2HorsEquil2AMRVAC.csv"]
 
 abreak = [True,True,True,True,True,True,
-          False,True,False,True,False,True]
+          True,True,False,False,True,True]
 
 for i,el in enumerate(filenames):  
     if(abreak[i]):continue
@@ -883,7 +876,7 @@ for i,el in enumerate(filenames):
     Xdata = list(data[0][:])
     Ydata = list(data[1][:])
     pyplot.semilogy(np.log10(Xdata), Ydata,
-                  color=a4[i],lw=a9[i], marker=a13[i],markersize=a14[i],ls=a10[i],label=r'{:s}'.format(a5[i]),zorder=0)
+                  color=a4[i],lw=a9[i], marker=a13[i],markersize=a14[i],ls=a10[i],label=r'{:s}'.format(a5[i]))
     pyplot.xlabel(r'$\log_{10}(T)$ [K]')
     pyplot.ylabel(r'$|\Lambda|$ [erg s$^{-1}$ cm$^{3}$]')
 
@@ -891,4 +884,4 @@ for i,el in enumerate(filenames):
 pyplot.legend(loc='best',
           fancybox=True, shadow=True)    
 pyplot.tight_layout()
-pyplot.savefig("cooling_curve_vs_old.pdf")
+pyplot.savefig("cooling_curve_check_H2_1.pdf")

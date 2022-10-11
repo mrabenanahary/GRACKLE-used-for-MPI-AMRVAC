@@ -35,9 +35,10 @@ if __name__ == "__main__":
     if 'PRIMORDIAL_CHEM' in os.environ:
         my_chemistry.primordial_chemistry = int(os.environ['PRIMORDIAL_CHEM'])
     else:
-        my_chemistry.primordial_chemistry = 2
+        my_chemistry.primordial_chemistry = 1
+    number_of_iter = 1
     my_chemistry.dust_chemistry = 1
-    my_chemistry.h2_on_dust = 1
+    my_chemistry.h2_on_dust = 0
     my_chemistry.metal_cooling = 1
     my_chemistry.use_dust_density_field = 1
     my_chemistry.UVbackground = 0
@@ -68,29 +69,41 @@ if __name__ == "__main__":
     # This container holds the solver parameters, units, and fields.
     #temperature = np.array([1.00000000e+09])
     temperature = np.logspace(1, 9, 200)
+
+    temperature_zero = np.copy(temperature)
+
+    make_converge = True
+    
     fc = setup_fluid_container(my_chemistry,
                                density=mass_hydrogen_cgs*1.0e0,
                                temperature=temperature,
-                               converge=True)
+                               converge=make_converge,
+                               max_iterations=number_of_iter)
 
     if my_chemistry.primordial_chemistry > 0:
         fc["specific_heating_rate"][:] = 0.
         fc["volumetric_heating_rate"][:] = 0.
 
-    fc.calculate_temperature()
-    fc.calculate_pressure()
-    fc.calculate_cooling_time()
+    
+    if(make_converge==False):
+        fc.calculate_temperature()
+        fc.calculate_pressure()
+        fc.calculate_cooling_time()
 
     density_proper = fc["density"] / \
         (my_chemistry.a_units *
          my_chemistry.a_value)**(3*my_chemistry.comoving_coordinates)
     cooling_rate = fc.chemistry_data.cooling_units * fc["energy"] / \
         np.abs(fc["cooling_time"]) / density_proper
+    print("cooling_rate 2: ", cooling_rate[-1])
+    print("energy 3 : ", fc["energy"][-1]*my_chemistry.energy_units)
+    print("cooling time 3 : ", fc["cooling_time"][-1]*my_chemistry.time_units)
+    print("mu 3 : ", fc["mu"][-1])
 
     #print("mu =")
     #print(fc["mu"])
 
-
+    print("temperautre zero = ",temperature_zero)
     data = {}
     t_sort = np.argsort(fc["temperature"])
     for field in fc.density_fields:
@@ -99,10 +112,12 @@ if __name__ == "__main__":
     data["energy"] = yt.YTArray(
         fc["energy"][t_sort] * my_chemistry.energy_units, "erg/g")
     data["temperature"] = yt.YTArray(fc["temperature"][t_sort], "K")
+    data["temperature_zero"] = yt.YTArray(temperature_zero[t_sort], "K")
     data["pressure"] = yt.YTArray(
         fc["pressure"][t_sort] * my_chemistry.pressure_units, "dyne/cm**2")
     data["cooling_time"] = yt.YTArray(fc["cooling_time"][t_sort]*my_chemistry.time_units, "s")
     data["cooling_rate"] = yt.YTArray(cooling_rate[t_sort], "erg*cm**3/s")
+    data["cooling_rate_zero"] = yt.YTArray(cooling_rate, "erg*cm**3/s")
     data["density_proper"] = yt.YTArray(density_proper[t_sort], "g/cm**3")
     data["mu"] = yt.YTArray(fc["mu"][t_sort],"")
     data["gamma"] = yt.YTArray(fc["gamma"][t_sort],"")
