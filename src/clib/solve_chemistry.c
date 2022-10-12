@@ -495,7 +495,7 @@ int f_solve_chemistry(code_units *my_units,
     // set temperature units
   double temperature_units = get_temperature_units(my_units);
 
-  if(grackle_data->primordial_chemistry>0){
+  /*if(grackle_data->primordial_chemistry>0){
     for(int i=0;i<1;i++){
       fprintf(stdout, "density : %e \n",my_fields->density[1]*my_units->density_units);
       fprintf(stdout, "energy : %e \n",my_fields->internal_energy[1]*my_units->velocity_units*my_units->velocity_units);
@@ -523,7 +523,7 @@ int f_solve_chemistry(code_units *my_units,
       }      
     }
   
-  }
+  }**/
 
 
   /*********************************************************************
@@ -541,9 +541,9 @@ int f_solve_chemistry(code_units *my_units,
     return FAIL;
   }
 
-  if(grackle_data->primordial_chemistry>0){
+  /**if(grackle_data->primordial_chemistry>0){
   fprintf(stdout, "After : \n");
-  }
+  }**/
   
   // Calculate cooling time.
   //gr_float *cooling_time;
@@ -554,10 +554,10 @@ int f_solve_chemistry(code_units *my_units,
     return FAIL;
   }
 
-  if(grackle_data->primordial_chemistry>0){
+  /**if(grackle_data->primordial_chemistry>0){
   fprintf(stderr, "Cooling time = %g s.\n", output_fields->cooling_time[0] *
           my_units->time_units);
-  }
+  }**/
 
     // Calculate temperature.
   //gr_float *temperature;
@@ -568,9 +568,9 @@ int f_solve_chemistry(code_units *my_units,
     return FAIL;
   }
 
-  if(grackle_data->primordial_chemistry>0){
+  /**if(grackle_data->primordial_chemistry>0){
   fprintf(stderr, "Temperature = %g K.\n", output_fields->temperature[0]);
-  }
+  }**/
 
   // Calculate pressure.
   //gr_float *pressure;
@@ -583,9 +583,9 @@ int f_solve_chemistry(code_units *my_units,
     return FAIL;
   }
 
-  if(grackle_data->primordial_chemistry>0){
+  /**if(grackle_data->primordial_chemistry>0){
   fprintf(stderr, "Pressure = %le dyne/cm^2.\n", output_fields->pressure[0]*pressure_units);
-  }
+  }**/
 
   // Calculate gamma.
   //gr_float *gamma;
@@ -596,9 +596,9 @@ int f_solve_chemistry(code_units *my_units,
     return FAIL;
   }
 
-  if(grackle_data->primordial_chemistry>0){
+  /**if(grackle_data->primordial_chemistry>0){
   fprintf(stderr, "gamma = %g.\n", output_fields->gamma[0]);
-  }
+  }**/
 
   //gr_float *cooling_rate;
   //cooling_rate = malloc(Ncells * sizeof(gr_float));
@@ -609,9 +609,9 @@ int f_solve_chemistry(code_units *my_units,
   (fabs(output_fields->cooling_time[i])*my_units->time_units);
   }
 
-  if(grackle_data->primordial_chemistry>0){
+  /**if(grackle_data->primordial_chemistry>0){
   fprintf(stderr, "L1 = %e.\n", output_fields->cooling_rate[0]);
-  }
+  }**/
 
   return SUCCESS;
 }
@@ -646,7 +646,7 @@ int f_calculate_cooling_rate(code_units *my_units,
 
 
   if(grackle_data->primordial_chemistry>0){
-  fprintf(stdout, "dt_cool_zero = %e.\n", output_fields->cooling_time[0]*my_units->time_units);
+  //fprintf(stdout, "dt_cool_zero = %e.\n", output_fields->cooling_time[0]*my_units->time_units);
   }  
 
   for (int i = 0;i < Ncells;i++) {
@@ -657,7 +657,7 @@ int f_calculate_cooling_rate(code_units *my_units,
   }
 
   if(grackle_data->primordial_chemistry>0){
-  fprintf(stdout, "L1_zero = %e.\n", output_fields->cooling_rate[0]);
+  //fprintf(stdout, "L1_zero = %e.\n", output_fields->cooling_rate[0]);
   }  
 
 
