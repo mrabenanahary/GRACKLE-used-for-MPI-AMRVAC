@@ -645,6 +645,10 @@ int f_calculate_cooling_rate(code_units *my_units,
   }
 
 
+  if(grackle_data->primordial_chemistry>0){
+  fprintf(stdout, "dt_cool_zero = %e.\n", output_fields->cooling_time[0]*my_units->time_units);
+  }  
+
   for (int i = 0;i < Ncells;i++) {
   output_fields->cooling_rate[i] = my_fields->internal_energy[i]*\
   my_units->velocity_units*my_units->velocity_units*\
