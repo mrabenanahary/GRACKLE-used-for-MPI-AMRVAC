@@ -8,7 +8,7 @@
 #
 # DATE:        2008-09-16
 #
-# This configuration assumes that build-essentials, gfortran,
+# This configuration assumes that build-essentials, gfortran, 
 # OpenMPI and HDF5 have been installed using apt-get.
 #
 #=======================================================================
@@ -31,11 +31,11 @@ LOCAL_HDF5_INSTALL = $(HDF5_INC_DIR)
 
 
 
-MACH_CC_NOMPI  = gcc # C compiler
-MACH_CXX_NOMPI = g++ # C++ compiler
-MACH_FC_NOMPI  = gfortran # Fortran 77
-MACH_F90_NOMPI = gfortran # Fortran 90
-MACH_LD_NOMPI  = gcc # Linker
+MACH_CC_NOMPI  = mpicc #gcc # C compiler
+MACH_CXX_NOMPI = mpicxx #g++ # C++ compiler
+MACH_FC_NOMPI  = mpif90 # Fortran 77
+MACH_F90_NOMPI = mpif90 # Fortran 90
+MACH_LD_NOMPI  = mpicc # Linker
 MACH_LIBTOOL   = libtool
 
 #-----------------------------------------------------------------------
@@ -48,9 +48,9 @@ MACH_DEFINES   = -DLINUX -DH5_USE_16_API -fPIC
 # Compiler flag settings
 #-----------------------------------------------------------------------
 
-MACH_OMPFLAGS = -fopenmp
+MACH_OMPFLAGS = -fopenmp 
 MACH_CPPFLAGS = -P -traditional
-# Intel C/C++/Fortran compiler flags :
+# Intel C/C++/Fortran compiler flags : 
 # -mp1 = improves floating-point precision and consistency.
 # -prec-div = Improves precision of floating-point divides
 # -fp-port = Rounds floating-point results after floating-point operations --> Rounding to
@@ -62,11 +62,11 @@ MACH_CPPFLAGS = -P -traditional
 # -axMIC-AVX512 : the Intel compilers (only) can take advantage of a feature called "automatic CPU dispatch" that lets a single executable run optimally on more than one kind of processor.
 # - save = Causes variables to be placed in static memory.
 # - zero = Initializes to zero all local scalar variables of intrinsic type INTEGER, REAL, COMPLEX, or LOGICAL that are saved but not yet initialized
-MACH_CFLAGS   =  -DCONFIG_BFLOAT_8 # C compiler flags
-MACH_CXXFLAGS =  -DCONFIG_BFLOAT_8 # C++ compiler flags
+MACH_CFLAGS   =  # C compiler flags
+MACH_CXXFLAGS =  # C++ compiler flags
 MACH_FFLAGS   =  -cpp -ffixed-form -DCONFIG_BFLOAT_8 -fno-second-underscore -ffixed-line-length-132 #-fno-second-underscore -ffixed-line-length-132
 MACH_F90FLAGS =  -cpp -ffixed-form -DCONFIG_BFLOAT_8 -fno-second-underscore -ffixed-line-length-132 132 #-fno-second-underscore -ffixed-line-length-132
-#MACH_LDFLAGS  =
+#MACH_LDFLAGS  = 
 
 #-----------------------------------------------------------------------
 # Optimization flags
@@ -81,9 +81,9 @@ MACH_OPT_AGGRESSIVE  = -O3 -g
 # Includes
 #-----------------------------------------------------------------------
 
-LOCAL_INCLUDES_HDF5   = -I$(LOCAL_HDF5_INSTALL) -I/usr/include/x86_64-linux-gnu/ -I/usr/lib/gcc/x86_64-linux-gnu/11/include/ # HDF5 includes
+LOCAL_INCLUDES_HDF5   = -I$(LOCAL_HDF5_INSTALL) # HDF5 includes
 
-MACH_INCLUDES         = $(LOCAL_INCLUDES_HDF5)
+MACH_INCLUDES         = $(LOCAL_INCLUDES_HDF5) 
 
 #-----------------------------------------------------------------------
 # Libraries

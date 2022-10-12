@@ -615,3 +615,51 @@ int f_solve_chemistry(code_units *my_units,
 
   return SUCCESS;
 }
+
+int f_calculate_cooling_rate(code_units *my_units,
+                    grackle_field_data *my_fields,
+                    f_integer *field_size,
+                    solver_fields *output_fields)
+{
+ 
+
+
+  int Ncells;
+  Ncells = field_size->n[0];
+
+
+
+  /*********************************************************************
+  / Calling the chemistry solver
+  / These routines can now be called during the simulation.
+  *********************************************************************/
+
+
+  // Calculate cooling time.
+  //gr_float *cooling_time;
+  //cooling_time = malloc(Ncells * sizeof(gr_float));
+  if (calculate_cooling_time(my_units, my_fields,
+                             output_fields->cooling_time) == 0) {
+    fprintf(stderr, "Error in calculate_cooling_time.\n");
+    return FAIL;
+  }
+
+
+  for (int i = 0;i < Ncells;i++) {
+  output_fields->cooling_rate[i] = my_fields->internal_energy[i]*\
+  my_units->velocity_units*my_units->velocity_units*\
+  my_fields->density[i]*my_units->density_units/\
+  (fabs(output_fields->cooling_time[i])*my_units->time_units);
+  }
+
+  if(grackle_data->primordial_chemistry>0){
+  fprintf(stdout, "L1_zero = %e.\n", output_fields->cooling_rate[0]);
+  }  
+
+
+  //fprintf(stderr, "Cooling time = %g s.\n", output_fields->cooling_time[0] *
+//          my_units->time_units);
+
+return SUCCESS;
+  
+}
