@@ -475,7 +475,7 @@
 
       if (ispecies .gt. 1) then
 
-#define USE_GLOVER_ABEL2008
+!#define USE_GLOVER_ABEL2008
 #ifdef USE_GLOVER_ABEL2008
          do i = is+1, ie+1
             if ( itmask(i) ) then
@@ -534,7 +534,7 @@ c            gphdl1 = gphdl(i)/dom
          enddo
 #else
 
-#define USE_GALLI_PALLA1999
+!#define USE_GALLI_PALLA1999
 #define NO_OPTICAL_DEPTH_FUDGE
 
 !        Use the Galli and Palla (1999) cooling rates for molecular H.

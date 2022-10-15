@@ -129,6 +129,7 @@ if __name__=="__main__":
                           color="black", linestyle="--", label="T$_{dust}$"))
     pyplot.xlabel("$\\rho$ [g/cm$^{3}$]")
     pyplot.ylabel("T [K]")
+    pyplot.ylim(10,10000)
 
     pyplot.twinx()
     plots.extend(
@@ -137,6 +138,7 @@ if __name__=="__main__":
     pyplot.ylabel("H$_{2}$ fraction")
     pyplot.legend(plots, [plot.get_label() for plot in plots],
                   loc="lower right")
+    pyplot.ylim(1e-3,1)                  
 
     if os.environ.get("METAL_COOLING", 0) == "1":
         output = "freefall_metal"

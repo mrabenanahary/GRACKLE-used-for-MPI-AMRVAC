@@ -35,10 +35,10 @@ if __name__ == "__main__":
     if 'PRIMORDIAL_CHEM' in os.environ:
         my_chemistry.primordial_chemistry = int(os.environ['PRIMORDIAL_CHEM'])
     else:
-        my_chemistry.primordial_chemistry = 1
+        my_chemistry.primordial_chemistry = 2
     number_of_iter = 1
     my_chemistry.dust_chemistry = 1
-    my_chemistry.h2_on_dust = 0
+    my_chemistry.h2_on_dust = 1
     my_chemistry.metal_cooling = 1
     my_chemistry.use_dust_density_field = 1
     my_chemistry.UVbackground = 0
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     my_chemistry.H2_self_shielding = 0
     my_dir = os.path.dirname(os.path.abspath(__file__))
     grackle_data_file = bytearray(os.path.join(
-        my_dir, "..", "..", "..", "input", "CloudyData_UVB=HM2012_high_density.h5"), 'utf-8')
+        my_dir, "..", "..", "..", "input", "CloudyData_noUVB.h5"), 'utf-8')
     my_chemistry.grackle_data_file = grackle_data_file
 
     my_chemistry.use_specific_heating_rate = 1
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     temperature_zero = np.copy(temperature)
 
-    make_converge = True
+    make_converge = False
     
     fc = setup_fluid_container(my_chemistry,
                                density=mass_hydrogen_cgs*1.0e0,
